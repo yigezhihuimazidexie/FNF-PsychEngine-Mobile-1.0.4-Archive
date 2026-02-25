@@ -127,7 +127,9 @@ class TitleState extends MusicBeatState
 
 		loadJsonData();
 		#if TITLE_SCREEN_EASTER_EGG easterEggData(); #end
-		Conductor.bpm = musicBPM;
+		//Conductor.bpm = musicBPM;
+		Conductor.bpm = 1140;
+
 
 		logoBl = new FlxSprite(logoPosition.x, logoPosition.y);
 		logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
@@ -222,7 +224,8 @@ class TitleState extends MusicBeatState
 	var enterPosition:FlxPoint = FlxPoint.get(100, 576);
 	
 	var useIdle:Bool = false;
-	var musicBPM:Float = 102;
+	//var musicBPM:Float = 102;
+	var musicBPM:Float = 140;
 	var danceLeftFrames:Array<Int> = [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29];
 	var danceRightFrames:Array<Int> = [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
@@ -239,7 +242,8 @@ class TitleState extends MusicBeatState
 					gfPosition.set(titleJSON.gfx, titleJSON.gfy);
 					logoPosition.set(titleJSON.titlex, titleJSON.titley);
 					enterPosition.set(titleJSON.startx, titleJSON.starty);
-					musicBPM = titleJSON.bpm;
+					//musicBPM = titleJSON.bpm;
+					musicBPM = 140;
 					
 					if(titleJSON.animation != null && titleJSON.animation.length > 0) animationName = titleJSON.animation;
 					if(titleJSON.dance_left != null && titleJSON.dance_left.length > 0) danceLeftFrames = titleJSON.dance_left;
