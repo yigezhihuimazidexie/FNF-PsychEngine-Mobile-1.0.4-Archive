@@ -1,9 +1,0 @@
-{
-	"name": "Q&A",
-	"description": "This mod is produced by the Pixel Vision Work team. Please refrain from using the game's source code. Before use, kindly consult with Cwy. Thank you for your cooperation------------bilibili",
-	"restart":false,
-	"runsGlobally": false,
-	"color": [170, 0, 255],
-	"discordRPC": "863222024192262205",
-	"iconFramerate": 10
-}
