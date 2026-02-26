@@ -61,6 +61,7 @@ class FreeplayState extends MusicBeatState
 	var bottomBG:FlxSprite;
 
 	var player:MusicPlayer;
+	var itemSpacing:Float = 120;
 
 	override function create()
 	{
@@ -247,6 +248,8 @@ class FreeplayState extends MusicBeatState
 		
 		player = new MusicPlayer(this);
 		add(player);
+
+		itemSpacing = 120;
 
 		//var barCount = 32;                    // 条形数量
 		//visualBars = [];
@@ -810,20 +813,26 @@ class FreeplayState extends MusicBeatState
 			}
 			_lastVisibles = [];
 		
+			var centerY:Float = FlxG.height / 2;
+			var safeBottom:Float = FlxG.height - 150;
+		
 			var min:Int = Math.round(Math.max(0, Math.min(songs.length, lerpSelected - _drawDistance)));
 			var max:Int = Math.round(Math.max(0, Math.min(songs.length, lerpSelected + _drawDistance)));
-		
-			var baseY:Float = 150;
-			var spacing:Float = 120;
 		
 			for (i in min...max)
 			{
 				var item:FreeplayItem = grpSongs.members[i];
+				var diff:Float = (i - lerpSelected);
+				var yPos:Float = centerY + diff * itemSpacing;
+		
+				if (yPos + item.itemHeight > safeBottom || yPos < 0)
+				{
+					item.visible = false;
+					continue;
+				}
+		
+				item.y = yPos;
 				item.visible = true;
-		
-				var diff:Float = (item.targetY - lerpSelected);
-				item.y = baseY + i * spacing + diff * 1.3 * 30;
-		
 				_lastVisibles.push(i);
 			}
 		}
@@ -870,6 +879,7 @@ class FreeplayItem extends FlxSpriteGroup
     public var bg:FlxSprite;
     public var text:FlxText;
     public var icon:HealthIcon;
+	public var itemHeight:Float;s
 
     public function new(x:Float, y:Float, songName:String, songCharacter:String, ?fixedWidth:Int = 0)
     {
@@ -904,6 +914,8 @@ class FreeplayItem extends FlxSpriteGroup
         icon = new HealthIcon(songCharacter);
         icon.setPosition(bgWidth + 10, (bgHeight - icon.height) / 2);
         add(icon);
+
+		itemHeight = bgHeight; 
     }
 
     public function select(selected:Bool)
