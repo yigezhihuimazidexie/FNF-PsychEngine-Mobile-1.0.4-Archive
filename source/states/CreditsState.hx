@@ -12,13 +12,11 @@ class CreditsState extends MusicBeatState
 	var bg:FlxSprite;
 	var intendedColor:FlxColor;
 
-	// 当前显示卡片的元素
 	var currentIcon:FlxSprite;
 	var currentName:FlxText;
 	var currentRole:FlxText;
 	var roleBox:FlxSprite;
 
-	// 卡片位置常量（可调）
 	var iconX:Float = 0;
 	var iconY:Float = 200;
 	var nameY:Float = 120;
@@ -33,18 +31,15 @@ class CreditsState extends MusicBeatState
 
 		persistentUpdate = true;
 
-		// 背景
 		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.antialiasing = ClientPrefs.data.antialiasing;
 		add(bg);
 		bg.screenCenter();
 
-		// 加载模组 credits
 		#if MODS_ALLOWED
 		for (mod in Mods.parseList().enabled) pushModCreditsToList(mod);
 		#end
 
-		// 默认 credits 列表（请复制你的完整列表）
 		var defaultList:Array<Array<String>> = [
 			["Cwy",		"Cwy",		"director",					"https://space.bilibili.com/3493119353948379?spm_id_from=333.337.0.0",	"444444"],
 			["Baka", "Baka", "Main Programmer","https://www.bilibili.com/video/BV1rs41197Xn/?share_source=copy_web&vd_source=5b936a9bef8d1a986b34aeda2b7ef5fb","#ADD8E6"],
@@ -56,17 +51,13 @@ class CreditsState extends MusicBeatState
 		];
 		for (i in defaultList) creditsStuff.push(i);
 
-		// 计算图标目标X（屏幕居中，假设图标宽150）
 		iconX = (FlxG.width - 150) / 2;
 
-		// 设置初始选中项（第一个可选项）
 		curSelected = 0;
 		while (unselectableCheck(curSelected)) curSelected++;
 
-		// 创建第一个卡片（无动画，方向任意）
 		buildCard(creditsStuff[curSelected], false, 1);
 
-		// 背景颜色
 		bg.color = CoolUtil.colorFromString(creditsStuff[curSelected][4]);
 		intendedColor = bg.color;
 
@@ -75,10 +66,8 @@ class CreditsState extends MusicBeatState
 		super.create();
 	}
 
-	// 根据数据构建卡片，animated 决定是否播放进入动画，direction 决定滑动方向（1=从右向左，-1=从左向右）
 	function buildCard(data:Array<String>, animated:Bool, direction:Int)
 	{
-		// 图标
 		var iconName:String = data[1];
 		var iconPath:String = 'credits/missing_icon';
 		if (iconName != null && iconName.length > 0)
@@ -93,13 +82,11 @@ class CreditsState extends MusicBeatState
 		currentIcon.updateHitbox();
 		add(currentIcon);
 
-		// 名字 (vcr.ttf)
 		currentName = new FlxText(0, nameY, 0, data[0], 40);
 		currentName.setFormat(Paths.font("vcr.ttf"), 40, FlxColor.WHITE, CENTER);
 		currentName.screenCenter(X);
 		add(currentName);
 
-		// 职位（如果有）
 		var roleText:String = (data[2] != null && data[2].length > 0) ? data[2] : null;
 		if (roleText != null)
 		{
@@ -107,7 +94,6 @@ class CreditsState extends MusicBeatState
 			currentRole.setFormat(Paths.font("DM.ttf"), 24, FlxColor.BLACK, CENTER);
 			currentRole.screenCenter(X);
 
-			// 背景框
 			var boxWidth:Int = Std.int(currentRole.width + boxPadding * 2);
 			var boxHeight:Int = Std.int(currentRole.height + boxPadding);
 			roleBox = new FlxSprite().makeGraphic(boxWidth, boxHeight, 0xCCADD8E6); // 淡蓝半透明
@@ -118,10 +104,8 @@ class CreditsState extends MusicBeatState
 			add(currentRole);
 		}
 
-		// 如果播放进入动画
 		if (animated)
 		{
-			// 设置初始位置在屏幕外
 			var startX = iconX + direction * FlxG.width;
 			currentIcon.x = startX;
 			currentIcon.alpha = 0;
@@ -129,17 +113,14 @@ class CreditsState extends MusicBeatState
 			if (currentRole != null) currentRole.alpha = 0;
 			if (roleBox != null) roleBox.alpha = 0;
 
-			// 图标滑动
 			FlxTween.tween(currentIcon, {x: iconX, alpha: 1}, 0.4, {ease: FlxEase.sineInOut});
 
-			// 名字和职位淡入（延迟一点）
 			FlxTween.tween(currentName, {alpha: 1}, 0.3, {startDelay: 0.1});
 			if (currentRole != null) FlxTween.tween(currentRole, {alpha: 1}, 0.3, {startDelay: 0.1});
 			if (roleBox != null) FlxTween.tween(roleBox, {alpha: 1}, 0.3, {startDelay: 0.1});
 		}
 	}
 
-	// 销毁当前卡片
 	function destroyCard()
 	{
 		if (currentIcon != null) { remove(currentIcon); currentIcon.destroy(); }
@@ -148,31 +129,24 @@ class CreditsState extends MusicBeatState
 		if (roleBox != null) { remove(roleBox); roleBox.destroy(); }
 	}
 
-	// 切换人物
 	function changeSelection(change:Int = 0)
 	{
 		if (change == 0) return;
 
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 
-		// 保存旧选中索引，用于判断方向
 		var oldSelected = curSelected;
 
-		// 找到下一个可选的索引
 		do {
 			curSelected = FlxMath.wrap(curSelected + change, 0, creditsStuff.length - 1);
 		} while (unselectableCheck(curSelected));
 
-		// 计算滑动方向：1 表示下一个（从右向左），-1 表示上一个（从左向右）
 		var direction = (curSelected > oldSelected) ? 1 : -1;
 
-		// 销毁旧卡片
 		destroyCard();
 
-		// 构建新卡片并播放动画
 		buildCard(creditsStuff[curSelected], true, direction);
 
-		// 更新背景颜色
 		var newColor:FlxColor = CoolUtil.colorFromString(creditsStuff[curSelected][4]);
 		if (newColor != intendedColor)
 		{
@@ -182,7 +156,6 @@ class CreditsState extends MusicBeatState
 		}
 	}
 
-	// 判断是否为分隔线（不可选）
 	private function unselectableCheck(num:Int):Bool
 	{
 		return creditsStuff[num].length <= 1;
